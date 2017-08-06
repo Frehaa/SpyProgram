@@ -1,0 +1,7 @@
+*\bin
+*\obj
+*\debug
+*\release
+\packages
+.vs
+*\*.user
