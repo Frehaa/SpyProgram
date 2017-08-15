@@ -17,8 +17,6 @@ namespace SpyProgram
      */
     public static class Logger
     {
-        private static Stopwatch watch = Stopwatch.StartNew();
-        private static DateTime datetime = DateTime.Now;
         private static ICollection<TextWriter> outputStreams = new List<TextWriter>();
         private static ConcurrentQueue<string> messageQueue = new ConcurrentQueue<string>();
         private static string newLine = "";
@@ -48,17 +46,8 @@ namespace SpyProgram
 
         public static void Write(EventType type, string message)
         {
-            IncrementTime();
             messageQueue.Enqueue(CreateCompleteMessage(type, message));
             StartProccessingQueue();
-        }
-        
-        private static void IncrementTime()
-        {
-            long milliseconds = watch.ElapsedMilliseconds;
-            watch.Restart();
-
-            datetime = datetime.AddMilliseconds(milliseconds);
         }
 
         private static void StartProccessingQueue()
@@ -105,18 +94,9 @@ namespace SpyProgram
 
         private static string CreateCompleteMessage(EventType type, string message)
         {
-            return string.Format("[{0}] [{1}] - {2}", datetime, TypeToString(type), message);
+            return string.Format("[{0}] [{1}] - {2}", DateTime.Now, TypeToString(type), message);
         }
-
-        private static void Flush()
-        {
-            foreach (var stream in outputStreams)
-            {
-                stream.Flush();
-            }
-        }
-
-
+        
         private static string TypeToString(EventType type)
         {
             switch (type)
