@@ -79,9 +79,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InputSpy.cs" />
-    <Compile Include="KeyboardEventListener.cs" />
-    <Compile Include="MouseEventListener.cs" />
     <Compile Include="WINAPI\LowLevelMouseHook.cs" />
     <Compile Include="WINAPI\Flags.cs" />
     <Compile Include="WINAPI\HookProc.cs" />
