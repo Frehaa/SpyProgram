@@ -61,7 +61,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <NoWin32Manifest>true</NoWin32Manifest>
@@ -80,6 +80,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InputSpy.cs" />
+    <Compile Include="KeyboardEventListener.cs" />
+    <Compile Include="MouseEventListener.cs" />
+    <Compile Include="WINAPI\LowLevelMouseHook.cs" />
+    <Compile Include="WINAPI\Flags.cs" />
+    <Compile Include="WINAPI\HookProc.cs" />
+    <Compile Include="WINAPI\LowLevelKeyboardHook.cs" />
+    <Compile Include="WINAPI\Kernel32.cs" />
+    <Compile Include="WINAPI\Point.cs" />
+    <Compile Include="WINAPI\User32.cs" />
+    <Compile Include="WINAPI\WindowsAPIHelper.cs" />
     <Compile Include="WindowFocusSpy.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Program.cs" />

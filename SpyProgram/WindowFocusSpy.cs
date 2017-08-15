@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SpyProgram.WINAPI;
+using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace SpyProgram
 {
@@ -21,7 +17,7 @@ namespace SpyProgram
         public void Start()
         {
             watch = Stopwatch.StartNew();
-            windowTitle = GetActiveWindowTitle();            
+            windowTitle = WindowsAPIHelper.GetActiveWindowTitle();
             timer = new Timer(
                 callback: TimerCallback, 
                 state: this, 
@@ -32,7 +28,7 @@ namespace SpyProgram
 
         private void TimerCallback(object state)
         {
-            string activeWindowTitle = GetActiveWindowTitle();
+            string activeWindowTitle = WindowsAPIHelper.GetActiveWindowTitle();
             if (windowTitle != activeWindowTitle)
             {
                 ActiveWindowChanged(activeWindowTitle);
@@ -52,24 +48,6 @@ namespace SpyProgram
             return focusTime;
         }
 
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow();
 
-
-        [DllImport("user32.dll")]
-        private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
-
-        private string GetActiveWindowTitle()
-        {
-            const int nChars = 256;
-            StringBuilder Buff = new StringBuilder(nChars);
-            IntPtr handle = GetForegroundWindow();
-
-            if (GetWindowText(handle, Buff, nChars) > 0)
-            {
-                return Buff.ToString();
-            }
-            return null;
-        }
     }
 }
