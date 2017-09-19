@@ -14,32 +14,32 @@ namespace SpyProgram
 {
     class Program
     {
-        //static void Main(string[] args)
-        //{   
-        //    StreamWriter filestream = new StreamWriter(File.OpenWrite("logfile.log"));
+        static void Main(string[] args)
+        {
+            StreamWriter filestream = new StreamWriter(File.OpenWrite("logfile.log"));
 
-        //    Logger.NewLine = filestream.NewLine;
+            Logger.NewLine = filestream.NewLine;
 
-        //    Logger.AddOutputStream(filestream);
-        //    Logger.AddOutputStream(Console.Out);
-            
-        //    Logger.Write(Logger.EventType.INFO, "Application start");
-            
-        //    WindowFocusSpy spy = new WindowFocusSpy();
-        //    spy.WindowFocusChanged += Spy_WindowFocusChanged;
-        //    spy.Start();
+            Logger.AddOutputStream(filestream);
+            Logger.AddOutputStream(Console.Out);
 
-        //    Application.EnterThreadModal += Application_EnterThreadModal;
-        //    Application.LeaveThreadModal += Application_LeaveThreadModal;
-        //    Application.ThreadException += Application_ThreadException;
-        //    Application.ThreadExit += Application_ThreadExit;
-        //    Application.Idle += Application_Idle;
-        //    Application.ApplicationExit += Application_ApplicationExit;
+            Logger.Write(Logger.EventType.INFO, "Application start");
 
-        //    AppDomain.CurrentDomain.ProcessExit += Application_ApplicationExit;
-            
-        //    Application.Run();
-        //}
+            WindowFocusSpy spy = new WindowFocusSpy();
+            spy.WindowFocusChanged += Spy_WindowFocusChanged;
+            spy.Start();
+
+            Application.EnterThreadModal += Application_EnterThreadModal;
+            Application.LeaveThreadModal += Application_LeaveThreadModal;
+            Application.ThreadException += Application_ThreadException;
+            Application.ThreadExit += Application_ThreadExit;
+            Application.Idle += Application_Idle;
+            Application.ApplicationExit += Application_ApplicationExit;
+
+            AppDomain.CurrentDomain.ProcessExit += Application_ApplicationExit;
+
+            Application.Run();
+        }
 
         private static void Spy_WindowFocusChanged(string newWindowTitle, string oldWindowTitle, TimeSpan focusSpan)
         {

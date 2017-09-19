@@ -7,10 +7,9 @@ namespace SpyProgram
 {
     public class WindowFocusSpy
     {
-        public delegate void FocusChanged(string newWindowTitle, string oldWindowTitle, TimeSpan focusSpan);
-        public event FocusChanged WindowFocusChanged;
-
-        private Timer timer;
+        private const int sleepTime = 500;
+        public event Action<string, string, TimeSpan> WindowFocusChanged;
+        
         private Stopwatch watch;
         private string windowTitle;
         
@@ -18,20 +17,22 @@ namespace SpyProgram
         {
             watch = Stopwatch.StartNew();
             windowTitle = WindowsAPIHelper.GetActiveWindowTitle();
-            timer = new Timer(
-                callback: TimerCallback, 
-                state: this, 
-                dueTime: 500, 
-                period: 500
-            );
+
+            Thread thread = new Thread(CheckForNewActiveWindow);
+            thread.Start();
         }
 
-        private void TimerCallback(object state)
+        private void CheckForNewActiveWindow()
         {
-            string activeWindowTitle = WindowsAPIHelper.GetActiveWindowTitle();
-            if (windowTitle != activeWindowTitle)
+            while (true)
             {
-                ActiveWindowChanged(activeWindowTitle);
+                string activeWindowTitle = WindowsAPIHelper.GetActiveWindowTitle();
+                if (windowTitle != activeWindowTitle)
+                {
+                    ActiveWindowChanged(activeWindowTitle);
+                }
+
+                Thread.Sleep(sleepTime);
             }
         }
 
@@ -47,7 +48,6 @@ namespace SpyProgram
             watch.Restart();
             return focusTime;
         }
-
 
     }
 }

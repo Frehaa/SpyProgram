@@ -66,21 +66,19 @@ namespace SpyProgram
             if (messageQueue.IsEmpty)
                 return;
 
-            StringBuilder messageBuilder = new StringBuilder();
+            string message = BuildMessage();
+            WriteMessage(message);
 
-            while (!messageQueue.IsEmpty)
-            {
-                if (messageQueue.TryDequeue(out string message))
-                {    
-                    messageBuilder.Append(message + NewLine);
-                }                
-            }
+            IsProcessing = false;
+        }
 
+        private static void WriteMessage(string message)
+        {
             foreach (var stream in outputStreams)
             {
                 try
                 {
-                    stream.Write(messageBuilder.ToString());
+                    stream.Write(message);
                     stream.Flush();
                 }
                 catch (IOException e)
@@ -88,8 +86,19 @@ namespace SpyProgram
                     Debug.Write("IOException happened: " + e.Message);
                 }
             }
+        }
 
-            IsProcessing = false;
+        private static string BuildMessage()
+        {
+            StringBuilder messageBuilder = new StringBuilder();
+            while (!messageQueue.IsEmpty)
+            {
+                if (messageQueue.TryDequeue(out string message))
+                {
+                    messageBuilder.Append(message + NewLine);
+                }
+            }
+            return messageBuilder.ToString();
         }
 
         private static string CreateCompleteMessage(EventType type, string message)
