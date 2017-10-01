@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.ServiceProcess;
 using System.Diagnostics;
 using System.Windows.Forms;
+using SpyProgram.Logging;
 
 namespace SpyProgram
 {
@@ -16,14 +17,15 @@ namespace SpyProgram
     {
         static void Main(string[] args)
         {
-            StreamWriter filestream = new StreamWriter(File.OpenWrite("logfile.log"));
+            var fileStream = File.Open("logfile.log", FileMode.Append, FileAccess.Write, FileShare.Read);
+            var streamWritter = new StreamWriter(fileStream);
 
-            Logger.NewLine = filestream.NewLine;
+            Logger.NewLine = streamWritter.NewLine;
 
-            Logger.AddOutputStream(filestream);
+            Logger.AddOutputStream(streamWritter);
             Logger.AddOutputStream(Console.Out);
 
-            Logger.Write(Logger.EventType.INFO, "Application start");
+            Logger.Write(EventType.INFO, "Application start");
 
             WindowFocusSpy spy = new WindowFocusSpy();
             spy.WindowFocusChanged += Spy_WindowFocusChanged;
@@ -43,38 +45,38 @@ namespace SpyProgram
 
         private static void Spy_WindowFocusChanged(string newWindowTitle, string oldWindowTitle, TimeSpan focusSpan)
         {
-            Logger.Write(Logger.EventType.INFO, "Focus lost: " + oldWindowTitle + " focus duration: " + focusSpan);
-            Logger.Write(Logger.EventType.INFO, "Focus gained: " + newWindowTitle);
+            Logger.Write(EventType.INFO, "Focus lost: " + oldWindowTitle + " focus duration: " + focusSpan);
+            Logger.Write(EventType.INFO, "Focus gained: " + newWindowTitle);
         }
 
         private static void Application_ThreadExit(object sender, EventArgs e)
         {
-            Logger.Write(Logger.EventType.INFO, "Application exiting thread: " + e.ToString());
+            Logger.Write(EventType.INFO, "Application exiting thread: " + e.ToString());
         }
 
         private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            Logger.Write(Logger.EventType.INFO, "Application thread exception: " + e.Exception.Message);
+            Logger.Write(EventType.INFO, "Application thread exception: " + e.Exception.Message);
         }
 
         private static void Application_LeaveThreadModal(object sender, EventArgs e)
         {
-            Logger.Write(Logger.EventType.INFO, "Application leave thread modal: " + e.ToString());
+            Logger.Write(EventType.INFO, "Application leave thread modal: " + e.ToString());
         }
 
         private static void Application_Idle(object sender, EventArgs e)
         {
-            Logger.Write(Logger.EventType.INFO, "Application idle: " + e.ToString());
+            Logger.Write(EventType.INFO, "Application idle: " + e.ToString());
         }
 
         private static void Application_EnterThreadModal(object sender, EventArgs e)
         {
-            Logger.Write(Logger.EventType.INFO, "Application enter thread modal:" + e.ToString());
+            Logger.Write(EventType.INFO, "Application enter thread modal:" + e.ToString());
         }
 
         private static void Application_ApplicationExit(object sender, EventArgs e)
         {
-            Logger.Write(Logger.EventType.INFO, "Application quit: " + e.ToString());
+            Logger.Write(EventType.INFO, "Application quit: " + e.ToString());
         }
     }
 }

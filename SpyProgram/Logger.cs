@@ -3,15 +3,18 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace SpyProgram
+namespace SpyProgram.Logging
 {
+    public enum EventType
+    {
+        INFO, ERROR
+    }
+
     /*
-     * The logger is used to write simple logging messages to a file with an event type, timestamp and message
+     * The logger is used to write simple logging messages to a class of type Textwriter with an event type, timestamp and message
      * 
      * 
      */
@@ -19,25 +22,10 @@ namespace SpyProgram
     {
         private static ICollection<TextWriter> outputStreams = new List<TextWriter>();
         private static ConcurrentQueue<string> messageQueue = new ConcurrentQueue<string>();
-        private static string newLine = "";
+        private static object sync = new object();
 
         private static bool IsProcessing { get; set; }
-        public static string NewLine
-        {
-            get
-            {
-                return newLine;
-            }
-            set
-            {
-                newLine = value;
-            }
-        }
-
-        public enum EventType
-        {
-            INFO, ERROR
-        }
+        public static string NewLine { get; set; } = "";
         
         public static void AddOutputStream(TextWriter stream)
         {
@@ -46,28 +34,30 @@ namespace SpyProgram
 
         public static void Write(EventType type, string message)
         {
-            messageQueue.Enqueue(CreateCompleteMessage(type, message));
+            string logMessage = CreateLogMessage(type, message);
+            messageQueue.Enqueue(logMessage);
             StartProccessingQueue();
         }
 
         private static void StartProccessingQueue()
         {
-            if (IsProcessing)
+            lock (sync)
             {
-                return;
+                if (IsProcessing) return;
+                IsProcessing = true;
             }
-            IsProcessing = true;
+
             Thread thread = new Thread(ProccessQueue);
             thread.Start();
         }
 
         private static void ProccessQueue()
         {
-            if (messageQueue.IsEmpty)
-                return;
-
-            string message = BuildMessage();
-            WriteMessage(message);
+            if (!messageQueue.IsEmpty)
+            {
+                string message = CombineLogMessages();
+                WriteMessage(message);
+            }
 
             IsProcessing = false;
         }
@@ -88,7 +78,7 @@ namespace SpyProgram
             }
         }
 
-        private static string BuildMessage()
+        private static string CombineLogMessages()
         {
             StringBuilder messageBuilder = new StringBuilder();
             while (!messageQueue.IsEmpty)
@@ -101,7 +91,7 @@ namespace SpyProgram
             return messageBuilder.ToString();
         }
 
-        private static string CreateCompleteMessage(EventType type, string message)
+        private static string CreateLogMessage(EventType type, string message)
         {
             return string.Format("[{0}] [{1}] - {2}", DateTime.Now, TypeToString(type), message);
         }
