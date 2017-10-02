@@ -11,23 +11,23 @@ namespace SpyProgramCore
     {
         static void Main(string[] args)
         {
-            var fileStream = new FileStream("logfile.txt", FileMode.Append, FileAccess.Write, FileShare.Read);
-            var streamWriter = new StreamWriter(fileStream);
+            using (var fileStream = new FileStream("logfile.txt", FileMode.Append, FileAccess.Write, FileShare.Read))
+            using (var streamWriter = new StreamWriter(fileStream))
+            using (var cts = new CancellationTokenSource())
+            {
+                Logger.AddOutputStream(Console.Out);
+                Logger.AddOutputStream(streamWriter);
 
-            Logger.AddOutputStream(Console.Out);
-            Logger.AddOutputStream(streamWriter);
+                var bufferBlock = new BufferBlock<string>();
 
+                var t1 = Task.Run(() => Consumer(bufferBlock, cts.Token));
+                var t2 = Task.Run(() => Producer(bufferBlock, cts.Token));
 
-            var bufferBlock = new BufferBlock<string>();            
-            var cts = new CancellationTokenSource(20000);
+                Console.ReadKey();
+                cts.Cancel();
 
-            var t1 = Task.Run(() => Consumer(bufferBlock, cts.Token));
-            var t2 = Task.Run(() => Producer(bufferBlock, cts.Token));
-
-            Console.ReadKey();
-            cts.Cancel();
-
-            Task.WhenAll(t1, t2).Wait();
+                Task.WhenAll(t1, t2).Wait();
+            }
         }
 
         private static void Producer(ITargetBlock<string> targetBlock, CancellationToken token)
