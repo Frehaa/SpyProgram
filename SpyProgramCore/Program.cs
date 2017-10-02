@@ -15,6 +15,7 @@ namespace SpyProgramCore
             using (var streamWriter = new StreamWriter(fileStream))
             using (var cts = new CancellationTokenSource())
             {
+                Logger.NewLine = Console.Out.NewLine;
                 Logger.AddOutputStream(Console.Out);
                 Logger.AddOutputStream(streamWriter);
 
@@ -28,6 +29,7 @@ namespace SpyProgramCore
 
                 Task.WhenAll(t1, t2).Wait();
             }
+            Console.WriteLine("Wait done");
         }
 
         private static void Producer(ITargetBlock<string> targetBlock, CancellationToken token)
@@ -36,7 +38,7 @@ namespace SpyProgramCore
             {
                 ProducerWork(targetBlock, token);
             }
-            catch (OperationCanceledException e)
+            catch (OperationCanceledException)
             {
                 Console.WriteLine("Producer Cancelled");
             }
@@ -44,17 +46,25 @@ namespace SpyProgramCore
 
         private static void ProducerWork(ITargetBlock<string> targetBlock, CancellationToken token)
         {
-            int counter = 0;
+            var spy = new WindowFocusSpy();
+            spy.WindowFocusChanged += Spy_WindowFocusChanged;
+            spy.Start();
+
             while (true)
             {
-                if (token.IsCancellationRequested)
+               if (token.IsCancellationRequested)
                 {
                     token.ThrowIfCancellationRequested();
                 }
 
-                targetBlock.Post((counter++).ToString());
                 Task.Delay(500).Wait();
             }
+        }
+
+        private static void Spy_WindowFocusChanged(string newWindowTitle, string oldWindowTitle, TimeSpan windowsFocusTime)
+        {
+            Logger.Write(EventType.INFO, "Focus lost: " + oldWindowTitle + " - focus duration: " + windowsFocusTime);
+            Logger.Write(EventType.INFO, "Focus gained: " + newWindowTitle);
         }
 
         private static void Consumer(ISourceBlock<string> sourceBlock, CancellationToken token)
@@ -63,7 +73,7 @@ namespace SpyProgramCore
             {
                 ConsumerWork(sourceBlock, token);
             }
-            catch (OperationCanceledException e)
+            catch (OperationCanceledException)
             {
                 Console.WriteLine("Consumer cancelled");
             }

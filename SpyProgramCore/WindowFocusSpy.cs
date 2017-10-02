@@ -47,7 +47,6 @@ namespace SpyProgramCore
             TimeSpan focusTime = watch.Elapsed;
             watch.Restart();
             return focusTime;
-        }
-
+        }        
     }
 }
