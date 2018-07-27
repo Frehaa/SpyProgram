@@ -1,7 +1,6 @@
 ﻿using System;
 using SpyProgramCore.Logging;
 using System.IO;
-using System.Threading.Tasks.Dataflow;
 using System.Threading.Tasks;
 using System.Threading;
 
@@ -9,34 +8,35 @@ namespace SpyProgramCore
 {
     class Program
     {
+        private static Logger logger;
+
         static void Main(string[] args)
         {
+            
             using (var fileStream = new FileStream("logfile.txt", FileMode.Append, FileAccess.Write, FileShare.Read))
             using (var streamWriter = new StreamWriter(fileStream))
             using (var cts = new CancellationTokenSource())
+            using (logger = new Logger())
             {
-                Logger.NewLine = Console.Out.NewLine;
-                Logger.AddOutputStream(Console.Out);
-                Logger.AddOutputStream(streamWriter);
+                logger.AddOutputStream(Console.Out);
+                logger.AddOutputStream(streamWriter);
 
-                var bufferBlock = new BufferBlock<string>();
-
-                var t1 = Task.Run(() => Consumer(bufferBlock, cts.Token));
-                var t2 = Task.Run(() => Producer(bufferBlock, cts.Token));
+                var t = Task.Run(() => Producer(cts.Token));
 
                 Console.ReadKey();
                 cts.Cancel();
 
-                Task.WhenAll(t1, t2).Wait();
+                t.Wait();
             }
+                
             Console.WriteLine("Wait done");
         }
 
-        private static void Producer(ITargetBlock<string> targetBlock, CancellationToken token)
+        private static void Producer(CancellationToken token)
         {
             try
             {
-                ProducerWork(targetBlock, token);
+                ProducerWork(token);
             }
             catch (OperationCanceledException)
             {
@@ -44,48 +44,23 @@ namespace SpyProgramCore
             }
         }
 
-        private static void ProducerWork(ITargetBlock<string> targetBlock, CancellationToken token)
+        private static void ProducerWork(CancellationToken token)
         {
             var spy = new WindowFocusSpy();
             spy.WindowFocusChanged += Spy_WindowFocusChanged;
             spy.Start();
 
-            while (true)
-            {
-               if (token.IsCancellationRequested)
-                {
-                    token.ThrowIfCancellationRequested();
-                }
-
+            while (!token.IsCancellationRequested)
                 Task.Delay(500).Wait();
-            }
+
+            spy.Stop();
+            token.ThrowIfCancellationRequested();
         }
 
         private static void Spy_WindowFocusChanged(string newWindowTitle, string oldWindowTitle, TimeSpan windowsFocusTime)
         {
-            Logger.Write(EventType.INFO, "Focus lost: " + oldWindowTitle + " - focus duration: " + windowsFocusTime);
-            Logger.Write(EventType.INFO, "Focus gained: " + newWindowTitle);
-        }
-
-        private static void Consumer(ISourceBlock<string> sourceBlock, CancellationToken token)
-        {
-            try
-            {
-                ConsumerWork(sourceBlock, token);
-            }
-            catch (OperationCanceledException)
-            {
-                Console.WriteLine("Consumer cancelled");
-            }
-        }
-
-        private static void ConsumerWork(ISourceBlock<string> sourceBlock, CancellationToken token)
-        {
-            while (true)
-            {
-                string data = sourceBlock.Receive(token);
-                Console.WriteLine(data);
-            }
+            logger.Write(EventType.INFO, "Focus lost: " + oldWindowTitle + " - focus duration: " + windowsFocusTime);
+            logger.Write(EventType.INFO, "Focus gained: " + newWindowTitle);
         }
     }
 }

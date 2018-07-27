@@ -2,9 +2,15 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SpyProgramCore
 {
+    /// <summary>
+    /// Spy for window focus. 
+    /// Every time the focus of the window changes to another window the class evokes the WindowFocusChanged event.
+    /// There is a 500ms internal sleep timer so if focus changes faster than this there is a chance 
+    /// </summary>
     public class WindowFocusSpy
     {
         private const int sleepTime = 500;
@@ -12,27 +18,42 @@ namespace SpyProgramCore
         
         private Stopwatch watch;
         private string windowTitle;
+        private Task spyTask = null;
+        private CancellationTokenSource cts = new CancellationTokenSource();
         
         public void Start()
         {
+            if (spyTask != null)
+                throw new InvalidOperationException("Spy already started.");
+
             watch = Stopwatch.StartNew();
             windowTitle = WindowsAPIHelper.GetActiveWindowTitle();
 
-            Thread thread = new Thread(CheckForNewActiveWindow);
-            thread.Start();
+            spyTask = Task.Run(() => CheckForNewActiveWindow(), cts.Token);            
+        }
+
+        public void Stop()
+        {
+            InvokeIfWindowChanged();
+            cts.Cancel();
+            spyTask.Wait();
         }
 
         private void CheckForNewActiveWindow()
         {
-            while (true)
-            {
-                string activeWindowTitle = WindowsAPIHelper.GetActiveWindowTitle();
-                if (windowTitle != activeWindowTitle)
-                {
-                    ActiveWindowChanged(activeWindowTitle);
-                }
-
+            while (!cts.IsCancellationRequested)
+            {   
+                InvokeIfWindowChanged();
                 Thread.Sleep(sleepTime);
+            }
+        }
+
+        private void InvokeIfWindowChanged()
+        {
+            string activeWindowTitle = WindowsAPIHelper.GetActiveWindowTitle();
+            if (windowTitle != activeWindowTitle)
+            {
+                ActiveWindowChanged(activeWindowTitle);
             }
         }
 

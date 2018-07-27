@@ -13,33 +13,32 @@ namespace SpyProgramCore.Logging
         INFO, ERROR
     }
 
-    /*
-     * The logger is used to write simple logging messages to a class of type Textwriter with an event type, timestamp and message
-     * 
-     * 
-     */
-    public static class Logger
+    /// <summary>
+    /// The logger is used to write simple logging messages to a class of type Textwriter with an event type, timestamp and message
+    /// </summary>
+    public class Logger : IDisposable
     {
-        private static ICollection<TextWriter> outputStreams = new List<TextWriter>();
-        private static ConcurrentQueue<string> messageQueue = new ConcurrentQueue<string>();
-        private static object sync = new object();
+        private ICollection<TextWriter> outputStreams = new List<TextWriter>();
+        private ConcurrentQueue<string> messageQueue = new ConcurrentQueue<string>();
+        private Thread proccessingThread;
+        private object sync = new object();
 
-        private static bool IsProcessing { get; set; }
-        public static string NewLine { get; set; } = "";
+        private bool IsProcessing { get; set; }
+        public string NewLine { get; set; } = Environment.NewLine;
         
-        public static void AddOutputStream(TextWriter stream)
+        public void AddOutputStream(TextWriter stream)
         {
             outputStreams.Add(stream);
         }
 
-        public static void Write(EventType type, string message)
+        public void Write(EventType type, string message)
         {
             string logMessage = CreateLogMessage(type, message);
             messageQueue.Enqueue(logMessage);
             StartProccessingQueue();
         }
 
-        private static void StartProccessingQueue()
+        private void StartProccessingQueue()
         {
             lock (sync)
             {
@@ -47,11 +46,11 @@ namespace SpyProgramCore.Logging
                 IsProcessing = true;
             }
 
-            Thread thread = new Thread(ProccessQueue);
-            thread.Start();
+            proccessingThread = new Thread(ProccessQueue);
+            proccessingThread.Start();
         }
 
-        private static void ProccessQueue()
+        private void ProccessQueue()
         {
             if (!messageQueue.IsEmpty)
             {
@@ -62,7 +61,7 @@ namespace SpyProgramCore.Logging
             IsProcessing = false;
         }
 
-        private static void WriteMessage(string message)
+        private void WriteMessage(string message)
         {
             foreach (var stream in outputStreams)
             {
@@ -78,7 +77,7 @@ namespace SpyProgramCore.Logging
             }
         }
 
-        private static string CombineLogMessages()
+        private string CombineLogMessages()
         {
             StringBuilder messageBuilder = new StringBuilder();
             while (!messageQueue.IsEmpty)
@@ -91,24 +90,20 @@ namespace SpyProgramCore.Logging
             return messageBuilder.ToString();
         }
 
-        private static string CreateLogMessage(EventType type, string message)
+        private string CreateLogMessage(EventType type, string message)
         {
-            return string.Format("[{0}] [{1}] - {2}", DateTime.Now, TypeToString(type), message);
+            return string.Format("[{0}] [{1}] - {2}", DateTime.Now, type, message);
         }
         
         private static string TypeToString(EventType type)
         {
-            switch (type)
-            {
-                case EventType.INFO:
-                    return "INFO";
-                case EventType.ERROR:
-                    return "ERROR";
-                default:
-                    throw new ArgumentException("No string associated with type");
-                    
-            }
-        }        
+            return type.ToString();
+        }
+
+        public void Dispose()
+        {
+            outputStreams.Clear();
+        }
     }
 
 }
