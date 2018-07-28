@@ -1,5 +1,4 @@
-﻿
-namespace SpyProgram.WINAPI
+﻿namespace SpyProgram.Windows.WINAPI
 {
     public enum MouseFlag : uint
     {

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace SpyProgramCore.WINAPI
+namespace SpyProgram.Windows.WINAPI
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct Point

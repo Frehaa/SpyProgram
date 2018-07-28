@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
-namespace SpyProgramCore.Logging
+namespace SpyProgram.Logging
 {
     public enum EventType
     {

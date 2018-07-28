@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace SpyProgram.WINAPI
+namespace SpyProgram.Windows.WINAPI
 {
     public static class Kernel32
     {

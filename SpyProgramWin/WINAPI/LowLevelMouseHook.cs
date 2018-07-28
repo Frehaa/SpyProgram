@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static SpyProgram.WINAPI.User32;
-using static SpyProgram.WINAPI.WindowsAPIHelper;
+using static SpyProgram.Windows.WINAPI.User32;
+using static SpyProgram.Windows.WINAPI.WindowsAPIHelper;
 
-namespace SpyProgram.WINAPI
+namespace SpyProgram.Windows.WINAPI
 {
     public class LowLevelMouseHook
     {

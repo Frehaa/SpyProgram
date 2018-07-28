@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace SpyProgramCore.WINAPI
+namespace SpyProgram.Windows.WINAPI
 {
     public static class User32
     {

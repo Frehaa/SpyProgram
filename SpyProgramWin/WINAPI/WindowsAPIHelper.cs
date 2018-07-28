@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace SpyProgramCore.WINAPI
+namespace SpyProgram.Windows.WINAPI
 {
     public static class WindowsAPIHelper
     {

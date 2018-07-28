@@ -1,10 +1,9 @@
-﻿using SpyProgramCore.WINAPI;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SpyProgramCore
+namespace SpyProgram
 {
     /// <summary>
     /// Spy for window focus. 
@@ -20,6 +19,12 @@ namespace SpyProgramCore
         private string windowTitle;
         private Task spyTask = null;
         private CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly IWindowInformer informer;
+
+        public WindowFocusSpy(IWindowInformer informer)
+        {
+            this.informer = informer;
+        }
         
         public void Start()
         {
@@ -27,7 +32,7 @@ namespace SpyProgramCore
                 throw new InvalidOperationException("Spy already started.");
 
             watch = Stopwatch.StartNew();
-            windowTitle = WindowsAPIHelper.GetActiveWindowTitle();
+            windowTitle = informer.GetActiveWindowTitle();
 
             spyTask = Task.Run(() => CheckForNewActiveWindow(), cts.Token);            
         }
@@ -51,7 +56,7 @@ namespace SpyProgramCore
 
         private void InvokeIfWindowChanged()
         {
-            string activeWindowTitle = WindowsAPIHelper.GetActiveWindowTitle();
+            string activeWindowTitle = informer.GetActiveWindowTitle();
             if (windowTitle != activeWindowTitle)
             {
                 ActiveWindowChanged(activeWindowTitle);

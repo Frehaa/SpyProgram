@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace SpyProgramCore
+namespace SpyProgram
 {
     public interface IKeydownTracker
     {
