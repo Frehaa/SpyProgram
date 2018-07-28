@@ -37,6 +37,7 @@ namespace SpyProgramCore
             InvokeIfWindowChanged();
             cts.Cancel();
             spyTask.Wait();
+            spyTask = null;
         }
 
         private void CheckForNewActiveWindow()
