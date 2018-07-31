@@ -39,10 +39,9 @@
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.Description = "Service for monitoring activity such as actions and active window.";
+            this.serviceInstaller1.Description = "Service for monitoring actions and active window.";
             this.serviceInstaller1.DisplayName = "SpyService";
             this.serviceInstaller1.ServiceName = "SpyService";
-            this.serviceInstaller1.AfterInstall += new System.Configuration.Install.InstallEventHandler(this.serviceInstaller1_AfterInstall);
             // 
             // ProjectInstaller
             // 
