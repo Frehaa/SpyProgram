@@ -2,7 +2,7 @@
 
 namespace SpyProgram
 {
-    public interface IKeydownTracker
+    public interface IKeyDownTracker
     {
         event Action<int> KeyDown;
         void Track();

@@ -48,17 +48,14 @@ namespace SpyProgram.Windows.WINAPI
 
         private int HookProcedureCallback(int code, IntPtr wParam, IntPtr lParam)
         {
-            if (code < 0)
+            if (code >= 0)
             {
-                return CallNextHookEx(IntPtr.Zero, code, wParam, lParam);
+                MouseFlag flag = (MouseFlag)wParam;
+                MSLLHOOKSTRUCT mouseStruct = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
+
+                HookActivated?.Invoke(mouseStruct.point, flag);
             }
-
-            MouseFlag flag = (MouseFlag)wParam;
-            MSLLHOOKSTRUCT mouseStruct = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
-
-            HookActivated?.Invoke(mouseStruct.point, flag);
-
-            return CallNextHookEx(IntPtr.Zero, code, wParam, lParam);
+            return CallNextHookEx(hookId, code, wParam, lParam);
         }
 
         private struct MSLLHOOKSTRUCT

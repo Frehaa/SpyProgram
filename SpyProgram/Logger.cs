@@ -21,7 +21,7 @@ namespace SpyProgram.Logging
         private ICollection<TextWriter> outputStreams = new List<TextWriter>();
         private ConcurrentQueue<string> messageQueue = new ConcurrentQueue<string>();
         private Thread proccessingThread;
-        private object sync = new object();
+        private readonly object sync = new object();
 
         private bool IsProcessing { get; set; }
         public string NewLine { get; set; } = Environment.NewLine;
@@ -92,7 +92,7 @@ namespace SpyProgram.Logging
 
         private string CreateLogMessage(EventType type, string message)
         {
-            return string.Format("[{0}] [{1}] - {2}", DateTime.Now, type, message);
+            return $"[{DateTime.Now}] [{type}] - {message}";
         }
         
         private static string TypeToString(EventType type)

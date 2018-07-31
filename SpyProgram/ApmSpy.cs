@@ -11,7 +11,7 @@ namespace SpyProgram
     /// </summary>
     public class ApmSpy
     {
-        public event Action<int> ActionCount;
+        public event Action<int, TimeSpan> ActionCount;
         private readonly object sync = new object();
 
         private Stopwatch watch;
@@ -19,11 +19,11 @@ namespace SpyProgram
         private Task keyTrackerTask;
         private Task mouseTrackerTask;
         private CancellationTokenSource cts; 
-        private readonly IKeydownTracker keyTracker;
+        private readonly IKeyDownTracker keyTracker;
         private readonly IMouseDownTracker mouseTracker;
         private int actionCount;
 
-        public ApmSpy(IKeydownTracker keyTracker, IMouseDownTracker mouseTracker)
+        public ApmSpy(IKeyDownTracker keyTracker, IMouseDownTracker mouseTracker)
         {
             this.keyTracker = keyTracker;
             this.mouseTracker = mouseTracker;
@@ -46,18 +46,14 @@ namespace SpyProgram
             mouseTracker.MouseDown += CountAction;
             keyTrackerTask = Task.Run(() => keyTracker.Track(), cts.Token);
             mouseTrackerTask = Task.Run(() => mouseTracker.Track(), cts.Token);
-            
+
             while (!cts.IsCancellationRequested)
             {
                 if (watch.Elapsed.Minutes >= 1.0d)
                     SendEvent();
 
-                Task.Delay(200).Wait();
+                Task.Delay(500).Wait();
             }
-
-            keyTracker.Stop();
-            mouseTracker.Stop();
-
             Task.WhenAll(keyTrackerTask, mouseTrackerTask).Wait();
 
             keyTracker.KeyDown -= CountAction;
@@ -68,7 +64,7 @@ namespace SpyProgram
         {
             lock (sync)
             {
-                ActionCount?.Invoke(actionCount);
+                ActionCount?.Invoke(actionCount, watch.Elapsed);
                 actionCount = 0;
                 watch.Restart();
             }
@@ -83,6 +79,9 @@ namespace SpyProgram
 
         public void Stop()
         {
+            if (spyTask == null)
+                return;
+
             cts.Cancel();
             spyTask.Wait();
             actionCount = 0;

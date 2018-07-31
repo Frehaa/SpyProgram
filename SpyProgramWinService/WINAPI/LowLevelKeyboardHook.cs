@@ -98,6 +98,7 @@ namespace SpyProgram.Windows.WINAPI
             return CallNextHookEx(IntPtr.Zero, code, wParam, lParam);
         }
 
+        
         private struct KBDLLHOOKSTRUCT
         {
             public uint virtualKeyCode;
