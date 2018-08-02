@@ -6,5 +6,10 @@
         {
             return WINAPI.WindowsAPIHelper.GetActiveWindowTitle();
         }
+
+        public string GetActiveWindowFileName()
+        {
+            return WINAPI.WindowsAPIHelper.GetActiveWindowProcessFileName();
+        }
     }
 }

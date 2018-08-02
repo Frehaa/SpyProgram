@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpyProgram", "SpyProgram\SpyProgram.csproj", "{FC116617-EB6C-4114-9010-CCBE1F33E0E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpyProgramWinService", "SpyProgramWinService\SpyProgramWinService.csproj", "{785685AD-5409-4BB3-9D92-D3B206775601}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpyProgramWin", "SpyProgramWin\SpyProgramWin.csproj", "{71263210-AA86-4988-945D-E1E8939DFE40}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{FC116617-EB6C-4114-9010-CCBE1F33E0E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC116617-EB6C-4114-9010-CCBE1F33E0E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC116617-EB6C-4114-9010-CCBE1F33E0E2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{785685AD-5409-4BB3-9D92-D3B206775601}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{785685AD-5409-4BB3-9D92-D3B206775601}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{785685AD-5409-4BB3-9D92-D3B206775601}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{785685AD-5409-4BB3-9D92-D3B206775601}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71263210-AA86-4988-945D-E1E8939DFE40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71263210-AA86-4988-945D-E1E8939DFE40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71263210-AA86-4988-945D-E1E8939DFE40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71263210-AA86-4988-945D-E1E8939DFE40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

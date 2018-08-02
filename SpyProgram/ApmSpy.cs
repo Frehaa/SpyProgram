@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Timers;
 
 namespace SpyProgram
 {
@@ -11,62 +10,42 @@ namespace SpyProgram
     /// </summary>
     public class ApmSpy
     {
-        public event Action<int, TimeSpan> ActionCount;
+        public event Action<int> ActionCount;
         private readonly object sync = new object();
 
-        private Stopwatch watch;
-        private Task spyTask = null;
-        private Task keyTrackerTask;
-        private Task mouseTrackerTask;
-        private CancellationTokenSource cts; 
+        private Timer timer;
         private readonly IKeyDownTracker keyTracker;
         private readonly IMouseDownTracker mouseTracker;
         private int actionCount;
 
-        public ApmSpy(IKeyDownTracker keyTracker, IMouseDownTracker mouseTracker)
+        public ApmSpy(double event_interval, IKeyDownTracker keyTracker, IMouseDownTracker mouseTracker)
         {
             this.keyTracker = keyTracker;
             this.mouseTracker = mouseTracker;
+            timer = new Timer();
+            timer.Interval = event_interval;
+            timer.Elapsed += Timer_Elapsed;
         }
 
         public void Start()
         {
-            if (spyTask != null)
-                throw new InvalidOperationException("Spy already started.");
+            if (timer.Enabled)
+                throw new InvalidOperationException($"{nameof(ApmSpy)} is already started.");
 
-            cts = new CancellationTokenSource();
-            watch = Stopwatch.StartNew();
             actionCount = 0;
-            spyTask = Task.Run(() => TrackActions(), cts.Token);
-        }
-
-        private void TrackActions()
-        {
             keyTracker.KeyDown += CountAction;
             mouseTracker.MouseDown += CountAction;
-            keyTrackerTask = Task.Run(() => keyTracker.Track(), cts.Token);
-            mouseTrackerTask = Task.Run(() => mouseTracker.Track(), cts.Token);
-
-            while (!cts.IsCancellationRequested)
-            {
-                if (watch.Elapsed.Minutes >= 1.0d)
-                    SendEvent();
-
-                Task.Delay(500).Wait();
-            }
-            Task.WhenAll(keyTrackerTask, mouseTrackerTask).Wait();
-
-            keyTracker.KeyDown -= CountAction;
-            mouseTracker.MouseDown -= CountAction;
+            timer.Start();
+            keyTracker.Track();
+            mouseTracker.Track();
         }
 
-        private void SendEvent()
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             lock (sync)
             {
-                ActionCount?.Invoke(actionCount, watch.Elapsed);
+                ActionCount?.Invoke(actionCount);
                 actionCount = 0;
-                watch.Restart();
             }
         }
 
@@ -79,14 +58,14 @@ namespace SpyProgram
 
         public void Stop()
         {
-            if (spyTask == null)
+            if (!timer.Enabled)
                 return;
 
-            cts.Cancel();
-            spyTask.Wait();
+            timer.Stop();
+            keyTracker.KeyDown -= CountAction;
+            mouseTracker.MouseDown -= CountAction;
             actionCount = 0;
-            spyTask = null;
-            
+
         }
     }
 }

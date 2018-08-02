@@ -7,5 +7,6 @@ namespace SpyProgram
     public interface IWindowInformer
     {
         string GetActiveWindowTitle();
+        string GetActiveWindowFileName();
     }
 }

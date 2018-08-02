@@ -83,9 +83,7 @@ namespace SpyProgram.Logging
             while (!messageQueue.IsEmpty)
             {
                 if (messageQueue.TryDequeue(out string message))
-                {
                     messageBuilder.Append(message + NewLine);
-                }
             }
             return messageBuilder.ToString();
         }

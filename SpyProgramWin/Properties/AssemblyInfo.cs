@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SpyProgramWinService")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("SpyProgram")]
+[assembly: AssemblyDescription("Program for monitoring different user activities such as number of actions a minute and active window.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SpyProgramWinService")]
+[assembly: AssemblyProduct("SpyProgramWin")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("785685ad-5409-4bb3-9d92-d3b206775601")]
+[assembly: Guid("71263210-aa86-4988-945d-e1e8939dfe40")]
 
 // Version information for an assembly consists of the following four values:
 //

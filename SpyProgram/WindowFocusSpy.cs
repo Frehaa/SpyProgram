@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Timers;
 
 namespace SpyProgram
 {
@@ -12,61 +11,60 @@ namespace SpyProgram
     /// </summary>
     public class WindowFocusSpy
     {
-        private const int sleepTime = 500;
-        public event Action<string, string, TimeSpan> WindowFocusChanged;
-        
+        private const double interval = 500;
+        /// <summary>
+        ///  New window title, old window title, focus time span
+        /// </summary>
+        public event Action<string, string, string, string, TimeSpan> WindowFocusChanged;
+
+        private readonly Timer timer;
         private Stopwatch watch;
         private string windowTitle;
-        private Task spyTask = null;
-        private CancellationTokenSource cts = new CancellationTokenSource();
+        private string fileName;
         private readonly IWindowInformer informer;
 
         public WindowFocusSpy(IWindowInformer informer)
         {
             this.informer = informer;
+            timer = new Timer();
+            timer.Elapsed += (s,e) => InvokeIfWindowChanged();
+            timer.Interval = interval;
         }
         
         public void Start()
         {
-            if (spyTask != null)
-                throw new InvalidOperationException("Spy already started.");
+            if (timer.Enabled)
+                throw new InvalidOperationException($"{nameof(WindowFocusSpy)} already started.");
 
             watch = Stopwatch.StartNew();
             windowTitle = informer.GetActiveWindowTitle();
-
-            spyTask = Task.Run(() => CheckForNewActiveWindow(), cts.Token);            
+            fileName = informer.GetActiveWindowFileName();
+            timer.Start();
         }
 
         public void Stop()
         {
+            if (!timer.Enabled)
+                return;
+
             InvokeIfWindowChanged();
-            cts.Cancel();
-            spyTask.Wait();
-            spyTask = null;
+            timer.Stop();
         }
-
-        private void CheckForNewActiveWindow()
-        {
-            while (!cts.IsCancellationRequested)
-            {   
-                InvokeIfWindowChanged();
-                Thread.Sleep(sleepTime);
-            }
-        }
-
+        
         private void InvokeIfWindowChanged()
         {
             string activeWindowTitle = informer.GetActiveWindowTitle();
-            if (windowTitle != activeWindowTitle)
-            {
-                ActiveWindowChanged(activeWindowTitle);
-            }
+            string activeFileName = informer.GetActiveWindowFileName();
+
+            if (windowTitle != activeWindowTitle || fileName != activeFileName)
+                ActiveWindowChanged(activeWindowTitle, activeFileName);
         }
 
-        private void ActiveWindowChanged(string newActiveWindowTitle)
+        private void ActiveWindowChanged(string newActiveWindowTitle, string newActiveWindowFileName)
         {
-            WindowFocusChanged?.Invoke(newActiveWindowTitle, windowTitle, GetWindowFocusTime());
+            WindowFocusChanged?.Invoke(newActiveWindowTitle, newActiveWindowFileName, windowTitle, fileName, GetWindowFocusTime());
             windowTitle = newActiveWindowTitle;
+            fileName = newActiveWindowFileName;
         }
 
         private TimeSpan GetWindowFocusTime()
